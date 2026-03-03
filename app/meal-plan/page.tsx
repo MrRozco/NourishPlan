@@ -44,38 +44,47 @@ End phase with: "PHASE X COMPLETE – Ready for next phase."
 • Never advance to the next phase without explicit user confirmation.
 • Suggest terminal commands inside code blocks.
 */
-import Link from "next/link";
 import { Suspense } from "react";
+import { unstable_noStore as noStore } from "next/cache";
 import { addDays, format, parseISO, startOfWeek } from "date-fns";
 
 import { createClient } from "@/lib/supabase/server";
 import { MealPlanGrid } from "@/components/meal-plan/meal-plan-grid";
+import { SavedPlansPanel } from "@/components/meal-plan/saved-plans-panel";
 import { saveMealPlan } from "@/app/meal-plan/actions";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface MealPlanPageProps {
-  searchParams: Promise<{ week?: string }>;
+  searchParams: Promise<{ week?: string; create?: string }>;
 }
 
 async function MealPlanContent({ searchParams }: MealPlanPageProps) {
+  noStore();
   const supabase = await createClient();
-  const { week } = await searchParams;
+  const { week, create } = await searchParams;
+  const shouldReset = create === "1";
   const resolvedWeekStart = week && !Number.isNaN(Date.parse(week)) ? week : null;
   const weekStartDate = resolvedWeekStart
     ? parseISO(resolvedWeekStart)
     : startOfWeek(new Date(), { weekStartsOn: 1 });
   const weekStart = format(weekStartDate, "yyyy-MM-dd");
+  const currentWeekStart = format(
+    startOfWeek(new Date(), { weekStartsOn: 1 }),
+    "yyyy-MM-dd",
+  );
 
   const { data: recipes, error: recipeError } = await supabase
     .from("recipes")
     .select("id, title")
     .order("created_at", { ascending: false });
 
-  const { data: mealPlan } = await supabase
-    .from("meal_plans")
-    .select("meals")
-    .eq("week_start", weekStart)
-    .maybeSingle();
+  const { data: mealPlan } = shouldReset
+    ? { data: null }
+    : await supabase
+        .from("meal_plans")
+        .select("meals")
+        .eq("week_start", weekStart)
+        .maybeSingle();
 
   const { data: savedPlans } = await supabase
     .from("meal_plans")
@@ -109,79 +118,32 @@ async function MealPlanContent({ searchParams }: MealPlanPageProps) {
     return acc;
   }, {} as Record<string, { breakfast: string | null; lunch: string | null; dinner: string | null }>);
 
+  const savedPlanSummaries = (savedPlans ?? []).map((plan) => {
+    const totalSlots = 21;
+    const filledSlots = plan.meals
+      ? Object.values(plan.meals).reduce<number>(
+          (count, day: any) =>
+            count +
+            (day?.breakfast ? 1 : 0) +
+            (day?.lunch ? 1 : 0) +
+            (day?.dinner ? 1 : 0),
+          0,
+        )
+      : 0;
+    return {
+      id: plan.id,
+      week_start: plan.week_start,
+      filledSlots,
+      totalSlots,
+    };
+  });
+
   return (
     <div className="space-y-8">
-      <section className="space-y-3" id="saved-plans">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 className="text-lg font-semibold">Saved meal plans</h2>
-            <p className="text-sm text-foreground/70">
-              Jump back to any week and keep planning with ease.
-            </p>
-          </div>
-          <Link href="#planner" className="text-sm font-medium text-primary">
-            Go to planner
-          </Link>
-        </div>
-        {savedPlans && savedPlans.length > 0 ? (
-          <div className="grid gap-3 md:grid-cols-2">
-            {savedPlans.map((plan) => {
-              const totalSlots = 21;
-              const filledSlots = plan.meals
-                ? Object.values(plan.meals).reduce<number>(
-                    (count, day: any) =>
-                      count +
-                      (day?.breakfast ? 1 : 0) +
-                      (day?.lunch ? 1 : 0) +
-                      (day?.dinner ? 1 : 0),
-                    0,
-                  )
-                : 0;
-
-              return (
-                <Card
-                  key={plan.id}
-                  className="border-border/60 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-                >
-                  <CardContent className="flex items-center justify-between py-4">
-                    <Link
-                      href={`/meal-plan?week=${plan.week_start}`}
-                      className="block"
-                    >
-                      <div>
-                        <p className="text-sm font-semibold">Week of</p>
-                        <p className="text-sm text-foreground/70">
-                          {format(parseISO(plan.week_start), "MMM d, yyyy")}
-                        </p>
-                        <p className="text-xs text-foreground/60">
-                          {filledSlots} of {totalSlots} meals planned
-                        </p>
-                      </div>
-                    </Link>
-                    <Link
-                      href={`/shopping-list?week=${plan.week_start}`}
-                      className="text-xs text-primary"
-                    >
-                      Shopping list
-                    </Link>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        ) : (
-          <Card className="border-border/60 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-            <CardContent className="space-y-3 py-6 text-sm text-foreground/70">
-              <p className="text-base font-semibold text-foreground">
-                Your next nourishing week awaits.
-              </p>
-              <p>
-                Select recipes for each day below and save your first plan.
-              </p>
-            </CardContent>
-          </Card>
-        )}
-      </section>
+      <SavedPlansPanel
+        savedPlans={savedPlanSummaries}
+        currentWeekStart={currentWeekStart}
+      />
 
       <section id="planner">
         <MealPlanGrid

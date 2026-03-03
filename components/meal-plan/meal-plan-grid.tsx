@@ -111,6 +111,10 @@ export function MealPlanGrid({
   );
 
   React.useEffect(() => {
+    setMeals(normalizedInitialMeals);
+  }, [normalizedInitialMeals]);
+
+  React.useEffect(() => {
     if (state.status === "success") {
       toast.success(state.message ?? "Meal plan saved.");
     }
