@@ -1,5 +1,44 @@
 <a href="https://demo-nextjs-with-supabase.vercel.app/">
   <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
+  <h1 align="center">NourishPlan</h1>
+</a>
+
+NourishPlan is a sleek, colorful, wellness-focused recipe manager and meal planner. It helps you save recipes, plan weekly meals, generate shopping lists, and use AI to discover new ideas.
+
+## Features
+- Recipe library with ingredients, instructions, and images
+- Weekly meal planning (7 days × 3 meals)
+- Auto-generated shopping lists
+- AI assistance for recipe ideas, nutrition estimates, and substitutions
+- Elegant light/dark modes and smooth micro-interactions
+
+## Tech Stack
+- Next.js 15 (App Router)
+- TypeScript (strict)
+- Tailwind CSS + shadcn/ui
+- Supabase (auth + Postgres)
+- Zod, sonner, lucide-react, date-fns, framer-motion
+
+## Getting Started
+1) Install dependencies:
+```bash
+npm install
+```
+2) Create .env.local:
+```
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+XAI_API_KEY=...
+```
+3) Run the app:
+```bash
+npm run dev
+```
+
+## Aesthetic Direction
+NourishPlan uses vibrant greens, warm corals, and soft creams to create a premium wellness experience. The UI favors spacious layouts, rounded cards, gentle gradients, and confident typography for a fresh, nourishing vibe.
+<a href="https://demo-nextjs-with-supabase.vercel.app/">
+  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
   <h1 align="center">Next.js and Supabase Starter Kit</h1>
 </a>
 

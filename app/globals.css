@@ -1,60 +1,106 @@
+/*
+// Aesthetic: sleek, colorful, wellness-focused – vibrant greens/oranges, fresh feel, sophisticated health & nutrition vibe
+Project Overview: NourishPlan
+A modern recipe manager and meal planner with AI assistance.
+• Users save personal recipes (title, ingredients, instructions, prep/cook time, servings, optional photo).
+• Create weekly meal plans (7 days × 3 meals: breakfast/lunch/dinner).
+• Generate shopping lists from selected meals.
+• AI features powered by Grok:
+– Input ingredients on hand → suggest matching recipes
+– Generate nutritional summaries for recipes/meals
+– Suggest ingredient substitutions
+• Routes: / (landing + sign-in), /dashboard (overview), /recipes (list + create), /recipes/[id] (detail), /meal-plan (weekly planner), /shopping-list
+Tech Stack
+• Next.js 15 (App Router, Server Components default, Server Actions for mutations)
+• TypeScript (strict mode)
+• Tailwind CSS + shadcn/ui
+• Supabase (auth, Postgres, realtime for meal-plan updates if collaborative later)
+• Zod (validation)
+• sonner (toasts)
+• lucide-react (icons)
+• date-fns (dates)
+• framer-motion (smooth animations)
+• Optional: next-cloudinary or Supabase Storage for recipe images
+Coding & Design Standards
+• Server Components by default; Server Actions for all mutations
+• Supabase client for all database operations
+• Strict TypeScript interfaces for every model
+• Modular, reusable components
+• Full error handling, optimistic UI updates, user-friendly toasts
+• Row Level Security (RLS) on all tables
+• JSDoc + meaningful inline comments
+• Tests after each phase: manual verification steps + Vitest for key logic
+• UI/UX override: every screen and component must feel sleek, colorful, appealing, and wellness-oriented — or it is incorrect
+• Dark mode: elegant dark variant (deep greens, warm dark corals, high-contrast accents)
+Workflow Rules
+• Structure every response exactly as:
+
+PHASE X: [Name]
+User Actions: (numbered list — if none write: "None – proceed to Agent Actions.")
+Agent Actions: (your code generation, refactoring, integration work)
+If waiting for user: "WAITING FOR USER CONFIRMATION: [precise instructions]. Reply exactly: 'Setup complete' when finished."
+After confirmation: Execute verification tests (manual steps + any Vitest) to confirm correct pipework (auth → db → ui → api)
+End phase with: "PHASE X COMPLETE – Ready for next phase."
+• Never advance to the next phase without explicit user confirmation.
+• Suggest terminal commands inside code blocks.
+*/
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --background: 48 100% 94%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 122 39% 49%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 16 100% 70%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 48 100% 90%;
+    --muted-foreground: 215 16% 35%;
+    --accent: 122 39% 58%;
+    --accent-foreground: 222 47% 11%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --border: 48 30% 85%;
+    --input: 48 30% 85%;
+    --ring: 122 39% 49%;
+    --chart-1: 122 39% 49%;
+    --chart-2: 16 100% 70%;
+    --chart-3: 48 90% 60%;
+    --chart-4: 280 45% 65%;
+    --chart-5: 200 60% 45%;
+    --radius: 0.85rem;
   }
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --background: 222 45% 6%;
+    --foreground: 48 100% 96%;
+    --card: 222 40% 10%;
+    --card-foreground: 48 100% 96%;
+    --popover: 222 40% 12%;
+    --popover-foreground: 48 100% 96%;
+    --primary: 122 45% 55%;
+    --primary-foreground: 222 47% 8%;
+    --secondary: 16 80% 58%;
+    --secondary-foreground: 48 100% 96%;
+    --muted: 222 30% 16%;
+    --muted-foreground: 48 30% 70%;
+    --accent: 122 28% 30%;
+    --accent-foreground: 48 100% 96%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 222 30% 20%;
+    --input: 222 30% 20%;
+    --ring: 122 45% 55%;
+    --chart-1: 122 45% 55%;
+    --chart-2: 16 85% 60%;
+    --chart-3: 48 80% 55%;
+    --chart-4: 280 55% 65%;
+    --chart-5: 200 65% 55%;
   }
 }
 
@@ -62,7 +108,18 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  a,
+  button,
+  input,
+  textarea {
+    @apply transition-all duration-300 ease-out;
   }
 }

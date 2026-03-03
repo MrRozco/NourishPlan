@@ -44,60 +44,37 @@ End phase with: "PHASE X COMPLETE – Ready for next phase."
 • Never advance to the next phase without explicit user confirmation.
 • Suggest terminal commands inside code blocks.
 */
+"use client";
+
 import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 hover:scale-[1.02] active:scale-[0.99] [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-  {
-    variants: {
-      variant: {
-        default:
-          "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 hover:brightness-105",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-md shadow-destructive/20 hover:bg-destructive/90",
-        outline:
-          "border border-primary/30 bg-background text-foreground shadow-sm hover:border-primary/60 hover:bg-primary/10",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-md shadow-secondary/20 hover:bg-secondary/90 hover:brightness-105",
-        ghost: "hover:bg-accent/30 hover:text-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  },
-);
+export function ThemeToggle() {
+  const { setTheme, theme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  const isDark = theme === "dark";
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="h-9 w-9"
+      aria-label="Toggle theme"
+    >
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </Button>
+  );
 }
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
-Button.displayName = "Button";
-
-export { Button, buttonVariants };
