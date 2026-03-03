@@ -48,11 +48,13 @@ End phase with: "PHASE X COMPLETE – Ready for next phase."
 
 import Link from "next/link";
 import * as React from "react";
+import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
 export function AuthButtonClient() {
+  const router = useRouter();
   const [email, setEmail] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -95,11 +97,19 @@ export function AuthButtonClient() {
   return (
     <div className="flex items-center gap-3 text-sm text-foreground/70">
       <span>Hey, {email}!</span>
-      <form action="/auth/logout" method="post">
-        <Button size="sm" variant="outline" type="submit">
-          Logout
-        </Button>
-      </form>
+      <Button
+        size="sm"
+        variant="outline"
+        type="button"
+        onClick={async () => {
+          const supabase = createClient();
+          await supabase.auth.signOut();
+          router.push("/auth/login");
+          router.refresh();
+        }}
+      >
+        Logout
+      </Button>
     </div>
   );
 }
